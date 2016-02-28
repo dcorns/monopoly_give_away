@@ -4,6 +4,7 @@
  * Copyright © 2016 Dale Corns
  */
 'use strict';
+var prizeData = {name:"Cash",value:50,available:5000,startAvailable:5000,tickets:{required:4, partList: ["M555A", 0, "M556B", 0, "M557C", 1, "M558D", 0], winner:''}};
 var prizes = document.getElementById("prizes");
 var add1 = document.getElementById("add1");
 var add2 = document.getElementById("add2");
