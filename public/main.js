@@ -4,8 +4,8 @@
  * Copyright © 2016 Dale Corns
  */
 'use strict';
-var prizeData = [{name:"Cash",value:50,available:5000,startAvailable:5000,tickets:{required:4, partList: ["?619A", 10, "?620B", 0, "?621C", 1, "?622D", 0, "?623E", 0, "?624F", 0, "?625G", 0, "?626H", 2], winner:'?625G'}}];
-
+var prizeData = [{"_id":"56d0da05a1f6053f7b7f5a75","name":"Redbox Movies for a Year","value":78,"available":1749,"tickets":{"required":4,"partList":["N559A",2,"N560B",1,"N561C",2,"N562D",0],"winner":"N562D"},"startAvailable":1750}];
+var currentPrize;
 var goBack = document.getElementById("goBack");
 var prizes = document.getElementById("prizes");
 var winnerTxt = document.getElementById("winnerTxt");
@@ -49,7 +49,7 @@ getData('/allPrizeData', function(err, data){
     console.dir(err);
     return;
   }
-  console.dir(data);
+  prizeData = JSON.parse(data);
 });
 
 prizes.addEventListener('click', function(e){
@@ -107,7 +107,14 @@ prizes.addEventListener('click', function(e){
         reset();
         break;
       default:
-        var idx = 0;
+        var idx = 0, c = 0;
+        for(c;c<prizeData.length;c++){
+          if(prizeData[c].viewId === e.target.id){
+            idx = c;
+            break;
+          }
+        }
+        currentPrize = prizeData[idx];
         var x = e.target.x.baseVal.value;
         var y = e.target.y.baseVal.value;
         prizes.setAttribute('viewBox', (x - 1).toString()+' '+ (y + 4).toString() + ' ' + '112 ' + '75');
@@ -231,19 +238,20 @@ console.log('reset');
   add12.setAttribute('x', '500');
   add14.setAttribute('x', '500');
   prizes.setAttribute('viewBox', '-400 -300 800 600');
+  updatePrize(currentPrize);
 }
 
 function adjustTicketQuantity(addBtn, qidx, q){
-  prizeData.tickets.partList[qidx] = prizeData.tickets.partList[qidx] + q;
-  if (prizeData.tickets.partList[qidx] < 0) prizeData.tickets.partList[qidx] = 0;
-  addBtn.textContent = prizeData.tickets.partList[qidx];
+  currentPrize.tickets.partList[qidx] = currentPrize.tickets.partList[qidx] + q;
+  if (currentPrize.tickets.partList[qidx] < 0) currentPrize.tickets.partList[qidx] = 0;
+  addBtn.textContent = currentPrize.tickets.partList[qidx];
 }
 
 function getData(url, cb, token){
   var ajaxReq = new XMLHttpRequest();
   ajaxReq.addEventListener('load', function(){
     if(ajaxReq.status === 200) cb(null, ajaxReq.responseText);
-    else cb(JSON.parse(ajaxReq.responseText), null);
+    else cb(ajaxReq.responseText, null);
   });
   ajaxReq.addEventListener('error', function(data){
     console.dir(ajaxReq);
@@ -257,4 +265,36 @@ function getData(url, cb, token){
     ajaxReq.setRequestHeader('Authorization', token);
   }
   ajaxReq.send();
+}
+
+function updatePrize(prize){
+  console.dir(prize);
+  ajaxPostJson('/updatePrize', prize, function(err, data){
+    if(err){
+      console.dir(err);
+      return;
+    }
+    console.dir(data);
+  });
+}
+
+function ajaxPostJson(url, jsonData, cb, token){
+  var ajaxReq = new XMLHttpRequest();
+  ajaxReq.addEventListener('load', function(){
+    if(ajaxReq.status === 200) cb(null, JSON.parse(ajaxReq.responseText));
+    else cb(JSON.parse(ajaxReq.responseText), null);
+  });
+  ajaxReq.addEventListener('error', function(data){
+    console.dir(ajaxReq);
+    console.dir(data);
+    cb({XMLHttpRequestError: 'A fatal error occurred, see console for more information'}, null);
+  });
+
+//Must open before setting request header, so this order is required
+  ajaxReq.open('POST', url, true);
+  ajaxReq.setRequestHeader('Content-Type', 'application/json');
+  if(token){
+    ajaxReq.setRequestHeader('Authorization', token);
+  }
+  ajaxReq.send(JSON.stringify(jsonData));
 }

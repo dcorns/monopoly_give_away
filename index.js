@@ -5,45 +5,39 @@
  */
 'use strict';
 var express = require('express');
-var mongoClient = require('mongodb').MongoClient;
+var bodyParser = require('body-parser');
+//var mongoClient = require('mongodb').MongoClient;
+var corngoose = require('./corngoose');
 var app = express();
+app.use(bodyParser.json());
 var port = process.env.PORT || 3000;
-//var db = mongoClient.connect('mongodb://localhost/monopoly', function(err, db){
-//  if(err){
-//    console.dir(err);
-//  }
-//  else{
-//    var test = db.collection('prizes').find({}).toArray(function (err, collection) {
-//      if (err){
-//        return null;
-//      }
-//      console.dir(collection);
-//    });
-//  }
-//});
-
+corngoose.startDB('monopoly');
 app.use(express.static(__dirname + '/public'));
 
 app.get('/allPrizeData', function(req, res){
-  var db = mongoClient.connect('mongodb://localhost/monopoly', function(err, db){
-  if(err){
-    console.dir(err);
-  }
-  else{
-    var test = db.collection('prizes').find({}).toArray(function (err, collection) {
-      if (err){
-        return null;
-      }
-      console.dir(collection);
-      res.status(200);
+  corngoose.getCollection('prizes', function(err, data){
+    if (err){
+            return null;
+          }
+    res.status(200);
+    res.contentType = 'json';
+    res.send(data);
+  });
+});
+
+app.post('/updatePrize', function(req, res){
+  corngoose.dbDocUpdate({name: req.body.name},req.body,'prizes',function(err, data){
+    if (err){
+      res.status(400);
       res.contentType = 'json';
-      res.send(collection);
-    });
-  }
+      res.send(err);
+      return null;
+    }
+    res.status(200);
+    res.contentType = 'json';
+    res.send(data);
+  });
 });
-
-});
-
 
 var server = app.listen(port, 'localhost', function(){
   console.log('Server listening on port ' + port);
