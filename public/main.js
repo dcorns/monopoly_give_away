@@ -6,6 +6,7 @@
 'use strict';
 var prizeData = [{"_id":"56d0da05a1f6053f7b7f5a75","name":"Redbox Movies for a Year","value":78,"available":1749,"tickets":{"required":4,"partList":["N559A",2,"N560B",1,"N561C",2,"N562D",0],"winner":"N562D"},"startAvailable":1750}];
 var currentPrize;
+var currentIndex;
 var goBack = document.getElementById("goBack");
 var prizes = document.getElementById("prizes");
 var winnerTxt = document.getElementById("winnerTxt");
@@ -114,7 +115,8 @@ prizes.addEventListener('click', function(e){
             break;
           }
         }
-        currentPrize = prizeData[idx];
+        currentPrize = setCurrentPrize(prizeData[idx]);
+        currentIndex = idx;
         var x = e.target.x.baseVal.value;
         var y = e.target.y.baseVal.value;
         prizes.setAttribute('viewBox', (x - 1).toString()+' '+ (y + 4).toString() + ' ' + '112 ' + '75');
@@ -221,8 +223,6 @@ prizes.addEventListener('click', function(e){
   catch (e){
     console.log(e);
   }
-
-
 });
 
 function reset(){
@@ -238,7 +238,10 @@ console.log('reset');
   add12.setAttribute('x', '500');
   add14.setAttribute('x', '500');
   prizes.setAttribute('viewBox', '-400 -300 800 600');
-  updatePrize(currentPrize);
+  if(prizeChanged()){
+    console.log('updating prize');
+    updatePrize(currentPrize);
+  }
 }
 
 function adjustTicketQuantity(addBtn, qidx, q){
@@ -275,6 +278,7 @@ function updatePrize(prize){
       return;
     }
     console.dir(data);
+    alert('Prize Updated');
   });
 }
 
@@ -297,4 +301,18 @@ function ajaxPostJson(url, jsonData, cb, token){
     ajaxReq.setRequestHeader('Authorization', token);
   }
   ajaxReq.send(JSON.stringify(jsonData));
+}
+
+function prizeChanged(){
+  var c = 0;
+  for(c; c < currentPrize.tickets.partList.length; c++){
+    console.log(currentPrize.tickets.partList[c], prizeData[currentIndex].tickets.partList[c]);
+    if(currentPrize.tickets.partList[c] !== prizeData[currentIndex].tickets.partList[c]) return true;
+  }
+  return (currentPrize.tickets.winner !== prizeData[currentIndex].tickets.winner);
+}
+
+function setCurrentPrize(prize){
+  var result = {name:prize.name, value: prize.value, available: prize.available, tickets:{"required":prize.tickets.required, partList:[prize.tickets.partList[0],prize.tickets.partList[1],prize.tickets.partList[2],prize.tickets.partList[3],prize.tickets.partList[4],prize.tickets.partList[5],prize.tickets.partList[6],prize.tickets.partList[7], prize.tickets.partList[8], prize.tickets.partList[9], prize.tickets.partList[10], prize.tickets.partList[11], prize.tickets.partList[12], prize.tickets.partList[13], prize.tickets.partList[14], prize.tickets.partList[15], prize.tickets.partList[16]],winner: prize.tickets.winner}, startAvailable: prize.startAvailable}
+  return result;
 }

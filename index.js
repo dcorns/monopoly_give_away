@@ -26,7 +26,7 @@ app.get('/allPrizeData', function(req, res){
 });
 
 app.post('/updatePrize', function(req, res){
-  corngoose.dbDocUpdate({name: req.body.name},req.body,'prizes',function(err, data){
+  corngoose.dbDocUpdate({name: req.body.name, value: req.body.value},req.body,'prizes',function(err, data){
     if (err){
       res.status(400);
       res.contentType = 'json';
