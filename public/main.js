@@ -271,14 +271,20 @@ function getData(url, cb, token){
 }
 
 function updatePrize(prize){
-  console.dir(prize);
   ajaxPostJson('/updatePrize', prize, function(err, data){
     if(err){
       console.dir(err);
       return;
     }
     console.dir(data);
-    alert('Prize Updated');
+    getData('/allPrizeData', function(err, data){
+      if (err){
+        alert('There was a problem loading prize Data!');
+        console.dir(err);
+        return;
+      }
+      prizeData = JSON.parse(data);
+    });
   });
 }
 
@@ -306,7 +312,6 @@ function ajaxPostJson(url, jsonData, cb, token){
 function prizeChanged(){
   var c = 0;
   for(c; c < currentPrize.tickets.partList.length; c++){
-    console.log(currentPrize.tickets.partList[c], prizeData[currentIndex].tickets.partList[c]);
     if(currentPrize.tickets.partList[c] !== prizeData[currentIndex].tickets.partList[c]) return true;
   }
   return (currentPrize.tickets.winner !== prizeData[currentIndex].tickets.winner);
