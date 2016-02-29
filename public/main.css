@@ -2,5 +2,14 @@ svg{
     border-style: solid;
     border-color: royalblue;
     border-width: 1px;
-    color:white;
+    fill: #0047A5;
+}
+.winnerTxt{
+    fill: black;
+}
+.partTxt{
+    fill: #C6DEF1;
+}
+.addTxt{
+    fill: #508EA5;
 }
