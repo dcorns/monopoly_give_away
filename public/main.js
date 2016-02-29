@@ -271,12 +271,17 @@ function getData(url, cb, token){
 }
 
 function updatePrize(prize){
+  if(!prize.tickets.winner){
+    var ticket = checkForRareTicket(prize);
+    if(ticket){
+      prize.tickets.winner = ticket;
+    }
+  }
   ajaxPostJson('/updatePrize', prize, function(err, data){
     if(err){
       console.dir(err);
       return;
     }
-    console.dir(data);
     getData('/allPrizeData', function(err, data){
       if (err){
         alert('There was a problem loading prize Data!');
@@ -320,4 +325,14 @@ function prizeChanged(){
 function setCurrentPrize(prize){
   var result = {name:prize.name, value: prize.value, available: prize.available, tickets:{"required":prize.tickets.required, partList:[prize.tickets.partList[0],prize.tickets.partList[1],prize.tickets.partList[2],prize.tickets.partList[3],prize.tickets.partList[4],prize.tickets.partList[5],prize.tickets.partList[6],prize.tickets.partList[7], prize.tickets.partList[8], prize.tickets.partList[9], prize.tickets.partList[10], prize.tickets.partList[11], prize.tickets.partList[12], prize.tickets.partList[13], prize.tickets.partList[14], prize.tickets.partList[15], prize.tickets.partList[16]],winner: prize.tickets.winner}, startAvailable: prize.startAvailable}
   return result;
+}
+
+function checkForRareTicket(prize){
+  var ticket = [];
+  var len = prize.tickets.partList.length, c = 1;
+  for(c; c < len; c+=2){
+    if(prize.tickets.partList[c] == 0) ticket.push(prize.tickets.partList[c-1]);
+  }
+  if(ticket.length === 1) return ticket[0];
+  return "";
 }
