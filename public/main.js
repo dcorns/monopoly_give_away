@@ -5,6 +5,7 @@
  */
 'use strict';
 var prizeData = {name:"Cash",value:50,available:5000,startAvailable:5000,tickets:{required:4, partList: ["?619A", 10, "?620B", 0, "?621C", 1, "?622D", 0, "?623E", 0, "?624F", 0, "?625G", 0, "?626H", 2], winner:'?625G'}};
+var goBack = document.getElementById("goBack");
 var prizes = document.getElementById("prizes");
 var winnerTxt = document.getElementById("winnerTxt");
 var add0 = document.getElementById("add0");
@@ -92,10 +93,15 @@ prizes.addEventListener('click', function(e){
       case 'minus14':
         adjustTicketQuantity(addTxt14, 15, -1);
         break;
+      case 'goBack':
+        reset();
+        break;
       default:
         var x = e.target.x.baseVal.value;
         var y = e.target.y.baseVal.value;
-        prizes.setAttribute('viewBox', (x-1).toString()+' '+ (y+4).toString()+' '+'112 '+'75');
+        prizes.setAttribute('viewBox', (x - 1).toString()+' '+ (y + 4).toString() + ' ' + '112 ' + '75');
+        goBack.setAttribute('cx', (x + 105).toString());
+        goBack.setAttribute('cy', (y + 5).toString());
         winnerTxt.setAttribute('x', (x + 55).toString());
         winnerTxt.setAttribute('y', (y + 24).toString());
         winnerTxt.textContent = 'Winning Ticket: ' + prizeData.tickets.winner;
@@ -200,6 +206,21 @@ prizes.addEventListener('click', function(e){
 
 
 });
+
+function reset(){
+console.log('reset');
+  winnerTxt.setAttribute('x', '500');
+  goBack.setAttribute('x', '500');
+  add0.setAttribute('x', '500');
+  add2.setAttribute('x', '500');
+  add4.setAttribute('x', '500');
+  add6.setAttribute('x', '500');
+  add8.setAttribute('x', '500');
+  add10.setAttribute('x', '500');
+  add12.setAttribute('x', '500');
+  add14.setAttribute('x', '500');
+  prizes.setAttribute('viewBox', '-400 -300 800 600');
+}
 
 function adjustTicketQuantity(addBtn, qidx, q){
   prizeData.tickets.partList[qidx] = prizeData.tickets.partList[qidx] + q;
