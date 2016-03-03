@@ -6,8 +6,7 @@
 'use strict';
 var express = require('express');
 var bodyParser = require('body-parser');
-//var mongoClient = require('mongodb').MongoClient;
-var corngoose = require('./corngoose');
+var corngoose = require('corngoose');
 var app = express();
 app.use(bodyParser.json());
 var port = process.env.PORT || 3000;

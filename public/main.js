@@ -9,6 +9,7 @@ var currentPrize;
 var currentIndex;
 var goBack = document.getElementById("goBack");
 var prizes = document.getElementById("prizes");
+var btnMenu = document.getElementById("btnMenu");
 var winnerTxt = document.getElementById("winnerTxt");
 var add0 = document.getElementById("add0");
 var add2 = document.getElementById("add2");
@@ -106,6 +107,9 @@ prizes.addEventListener('click', function(e){
         break;
       case 'goBack':
         reset();
+        break;
+      case 'btnMenu':
+
         break;
       default:
         var idx = 0, c = 0;
