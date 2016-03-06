@@ -13,3 +13,7 @@ svg{
 .addTxt{
     fill: #508EA5;
 }
+.less{
+    opacity: .2;
+    fill: #ffffff;
+}

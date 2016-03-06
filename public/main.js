@@ -52,7 +52,9 @@ getData('/allPrizeData', function(err, data){
     return;
   }
   prizeData = JSON.parse(data);
+  setWinningTickets(prizeData);
 });
+
 
 prizes.addEventListener('click', function(e){
   try{
@@ -106,12 +108,14 @@ prizes.addEventListener('click', function(e){
         adjustTicketQuantity(addTxt14, 15, -1);
         break;
       case 'goBack':
-        reset();
+        reset(e);
         break;
       case 'btnMenu':
 
         break;
       default:
+        var prizeId = e.target.id.substr(1);
+        document.getElementById('w' + prizeId).classList.add('less');
         var idx = 0, c = 0;
         for(c;c<prizeData.length;c++){
           if(prizeData[c].viewId === e.target.id){
@@ -126,6 +130,7 @@ prizes.addEventListener('click', function(e){
         prizes.setAttribute('viewBox', (x - 1).toString()+' '+ (y + 4).toString() + ' ' + '112 ' + '75');
         goBack.setAttribute('cx', (x + 105).toString());
         goBack.setAttribute('cy', (y + 5).toString());
+        goBack.setAttribute('data-PrizeId', prizeId);
         winnerTxt.setAttribute('x', (x + 55).toString());
         winnerTxt.setAttribute('y', (y + 24).toString());
         winnerTxt.textContent = 'Winning Ticket: ' + prizeData[idx].tickets.winner;
@@ -229,18 +234,43 @@ prizes.addEventListener('click', function(e){
   }
 });
 
-function reset(){
-console.log('reset');
+function reset(e){
+  document.getElementById('w' + e.target.attributes[5].value).classList.remove('less');
   winnerTxt.setAttribute('x', '500');
-  goBack.setAttribute('x', '500');
-  add0.setAttribute('x', '500');
-  add2.setAttribute('x', '500');
-  add4.setAttribute('x', '500');
-  add6.setAttribute('x', '500');
-  add8.setAttribute('x', '500');
-  add10.setAttribute('x', '500');
-  add12.setAttribute('x', '500');
-  add14.setAttribute('x', '500');
+  goBack.setAttribute('cx', '500');
+  add0.setAttribute('cx', '500');
+  add2.setAttribute('cx', '500');
+  add4.setAttribute('cx', '500');
+  add6.setAttribute('cx', '500');
+  add8.setAttribute('cx', '500');
+  add10.setAttribute('cx', '500');
+  add12.setAttribute('cx', '500');
+  add14.setAttribute('cx', '500');
+  goBack.setAttribute('cx', '500');
+  minus0.setAttribute('cx', '500');
+  minus2.setAttribute('cx', '500');
+  minus4.setAttribute('cx', '500');
+  minus6.setAttribute('cx', '500');
+  minus8.setAttribute('cx', '500');
+  minus10.setAttribute('cx', '500');
+  minus12.setAttribute('cx', '500');
+  minus14.setAttribute('cx', '500');
+  part1.setAttribute('x', '-500');
+  part2.setAttribute('x', '-500');
+  part3.setAttribute('x', '-500');
+  part4.setAttribute('x', '-500');
+  part5.setAttribute('x', '-500');
+  part6.setAttribute('x', '-500');
+  part7.setAttribute('x', '-500');
+  part8.setAttribute('x', '-500');
+  addTxt0.setAttribute('x', '500');
+  addTxt2.setAttribute('x', '500');
+  addTxt4.setAttribute('x', '500');
+  addTxt6.setAttribute('x', '500');
+  addTxt8.setAttribute('x', '500');
+  addTxt10.setAttribute('x', '500');
+  addTxt12.setAttribute('x', '500');
+  addTxt14.setAttribute('x', '500');
   prizes.setAttribute('viewBox', '-400 -300 800 600');
   if(prizeChanged()){
     console.log('updating prize');
@@ -327,7 +357,7 @@ function prizeChanged(){
 }
 
 function setCurrentPrize(prize){
-  var result = {name:prize.name, value: prize.value, available: prize.available, tickets:{"required":prize.tickets.required, partList:[prize.tickets.partList[0],prize.tickets.partList[1],prize.tickets.partList[2],prize.tickets.partList[3],prize.tickets.partList[4],prize.tickets.partList[5],prize.tickets.partList[6],prize.tickets.partList[7], prize.tickets.partList[8], prize.tickets.partList[9], prize.tickets.partList[10], prize.tickets.partList[11], prize.tickets.partList[12], prize.tickets.partList[13], prize.tickets.partList[14], prize.tickets.partList[15], prize.tickets.partList[16]],winner: prize.tickets.winner}, startAvailable: prize.startAvailable}
+  var result = {name:prize.name, value: prize.value, available: prize.available, tickets:{"required":prize.tickets.required, partList:[prize.tickets.partList[0],prize.tickets.partList[1],prize.tickets.partList[2],prize.tickets.partList[3],prize.tickets.partList[4],prize.tickets.partList[5],prize.tickets.partList[6],prize.tickets.partList[7], prize.tickets.partList[8], prize.tickets.partList[9], prize.tickets.partList[10], prize.tickets.partList[11], prize.tickets.partList[12], prize.tickets.partList[13], prize.tickets.partList[14], prize.tickets.partList[15], prize.tickets.partList[16]],winner: prize.tickets.winner}, startAvailable: prize.startAvailable};
   return result;
 }
 
@@ -339,4 +369,15 @@ function checkForRareTicket(prize){
   }
   if(ticket.length === 1) return ticket[0];
   return "";
+}
+
+function setWinningTickets(ary){
+  var len = ary.length, c = 0, ticket, wIdx;
+  for(c; c < len; c++){
+    ticket = checkForRareTicket(ary[c]);
+    if(ticket){
+      wIdx = ary[c].viewId.substr(1);
+      document.getElementById('w'+wIdx).textContent = ticket;
+    }
+  }
 }
