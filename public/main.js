@@ -381,3 +381,12 @@ function setWinningTickets(ary){
     }
   }
 }
+
+function ticketInput(){
+  var ticket = document.getElementById('ticket').value;
+  console.dir(prizeData);
+}
+
+document.getElementById('btnEnter').addEventListener('click', function(){
+  ticketInput();
+});
