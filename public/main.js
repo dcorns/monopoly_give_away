@@ -548,3 +548,4 @@ document.getElementById('ticket').addEventListener('keyup', function(e){
     e.target.value = '';
   }
 });
+document.getElementById('btnEnter').focus();
