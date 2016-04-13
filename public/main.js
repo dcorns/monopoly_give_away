@@ -397,12 +397,12 @@ function ticketInput(value){
             }
           }
           if(prop1 === 'partList'){
-            for(var ii=0; ii < prizeData[i][prop].required; ii += 2){
+            for(var ii=0; ii < prizeData[i][prop].required * 2; ii += 2){
+              console.log(prizeData[i][prop][prop1][ii]);
               if(prizeData[i][prop][prop1][ii] === ticket){
                 prizeData[i][prop][prop1][ii + 1]++;
                 updatePrize(prizeData[i]);
                 addTicketMessage(prizeData[i].viewId, ticket, prizeData[i][prop][prop1][ii + 1]);
-                break;
               }
             }
           }
@@ -548,4 +548,4 @@ document.getElementById('ticket').addEventListener('keyup', function(e){
     e.target.value = '';
   }
 });
-document.getElementById('btnEnter').focus();
+document.getElementById('ticket').focus();
