@@ -52,7 +52,7 @@ getData('/allPrizeData', function(err, data){
     return;
   }
   prizeData = JSON.parse(data);
-  setWinningTickets(prizeData);
+  configureUi(prizeData);
 });
 
 
@@ -360,7 +360,11 @@ function setCurrentPrize(prize){
   var result = {name:prize.name, value: prize.value, available: prize.available, tickets:{"required":prize.tickets.required, partList:[prize.tickets.partList[0],prize.tickets.partList[1],prize.tickets.partList[2],prize.tickets.partList[3],prize.tickets.partList[4],prize.tickets.partList[5],prize.tickets.partList[6],prize.tickets.partList[7], prize.tickets.partList[8], prize.tickets.partList[9], prize.tickets.partList[10], prize.tickets.partList[11], prize.tickets.partList[12], prize.tickets.partList[13], prize.tickets.partList[14], prize.tickets.partList[15], prize.tickets.partList[16]],winner: prize.tickets.winner}, startAvailable: prize.startAvailable};
   return result;
 }
-
+/**
+ * Takes a prize object and stores tickets with collected values o zero into an array, then checks the length of the array. If the length of the array is equal to one, then it returns that ticket as the winning ticket, else it returns ''
+ * @param {object} prize
+ * @returns {string} winning ticket id or '' if no winner identified
+ */
 function checkForRareTicket(prize){
   var ticket = [];
   var len = prize.tickets.partList.length, c = 1;
@@ -371,15 +375,34 @@ function checkForRareTicket(prize){
   return "";
 }
 
-function setWinningTickets(ary){
-  var len = ary.length, c = 0, ticket, wIdx;
-  for(c; c < len; c++){
-    ticket = checkForRareTicket(ary[c]);
-    if(ticket){
-      wIdx = ary[c].viewId.substr(1);
-      document.getElementById('w'+wIdx).textContent = ticket;
-    }
+/**
+ * Set the content for all the prize nodes with the data provided in ary
+ * @param {object []} ary Array of prize objects
+ */
+function configureUi(ary){
+  var len = ary.length, c = 0;
+  for (c; c < len; c++){
+    setWinningTicket(ary[c]);
+    setPrizeTitle(ary[c]);
   }
+}
+/**
+ * If a single ticket is left to win a prize set textContent for winning ticket in the prize DOM node to the ticket id.
+ * @param {object} prize
+ */
+function setWinningTicket(prize){
+  var ticket, wIdx;
+  ticket = checkForRareTicket(prize);
+  if(ticket){
+    wIdx = prize.viewId.substr(1);
+    document.getElementById('w'+ wIdx).textContent = ticket;
+  }
+}
+
+function setPrizeTitle(prize){
+  var tIdx;
+  tIdx = prize.viewId.substr(1);
+  document.getElementById('t' + tIdx).textContent = prize.name;
 }
 
 function ticketInput(value){
