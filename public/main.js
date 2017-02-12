@@ -361,9 +361,10 @@ function setCurrentPrize(prize){
   return result;
 }
 /**
- * Takes a prize object and stores tickets with collected values o zero into an array, then checks the length of the array. If the length of the array is equal to one, then it returns that ticket as the winning ticket, else it returns ''
- * @param {object} prize
- * @returns {string} winning ticket id or '' if no winner identified
+ * Takes a prize object and stores tickets with zero quantities into an array, then checks the length of the array. If the length of the array is equal to one, then it returns that ticket as the winning ticket, else it returns ''
+ * @param {Object} prize
+ * @param {[]} prize.tickets.partList - Of the form [ticketID, quantity,...] for each ticket required to win the prize
+ * @returns {string} winning - ticket id or '' if no winner identified
  */
 function checkForRareTicket(prize){
   var ticket = [];
@@ -374,10 +375,9 @@ function checkForRareTicket(prize){
   if(ticket.length === 1) return ticket[0];
   return "";
 }
-
 /**
- * Set the content for all the prize nodes with the data provided in ary
- * @param {object []} ary Array of prize objects
+ * Set the content for all the prize nodes with the data provided by the array of prize objects
+ * @param {Object[]} ary - Array of prize objects
  */
 function configureUi(ary){
   var len = ary.length, c = 0;
@@ -388,7 +388,8 @@ function configureUi(ary){
 }
 /**
  * If a single ticket is left to win a prize set textContent for winning ticket in the prize DOM node to the ticket id.
- * @param {object} prize
+ * @param {Object} prize
+ * @param {string} prize.viewId - The id of the top level svg that makes up the given prizes DOM node
  */
 function setWinningTicket(prize){
   var ticket, wIdx;
@@ -398,13 +399,21 @@ function setWinningTicket(prize){
     document.getElementById('w'+ wIdx).textContent = ticket;
   }
 }
-
+/**
+ * Set title text of SVG to match the name field of the given prize object
+ * @param {Object} prize - Object containing all prize data for a single prize
+ * @param {string} prize.name - Title of prize
+ * @param {string} prize.viewId - The id of the top level svg that makes up the given prizes DOM node
+ */
 function setPrizeTitle(prize){
   var tIdx;
   tIdx = prize.viewId.substr(1);
   document.getElementById('t' + tIdx).textContent = prize.name;
 }
-
+/**
+ *
+ * @param value
+ */
 function ticketInput(value){
   var ticket = value || document.getElementById('ticket').value.toUpperCase();
   var i = 0, len = prizeData.length;
