@@ -416,7 +416,7 @@ function setPrizeTitle(prize){
  */
 function ticketInput(value){
   var ticket = value || document.getElementById('ticket').value.toUpperCase();
-  var i = 0, len = prizeData.length;
+  var i = 0, len = prizeData.length, validTicket = false;
   for (i; i < len; i++){
     for (var prop in prizeData[i]){
       if(prop === 'tickets'){
@@ -430,8 +430,8 @@ function ticketInput(value){
           }
           if(prop1 === 'partList'){
             for(var ii=0; ii < prizeData[i][prop].required * 2; ii += 2){
-              console.log(prizeData[i][prop][prop1][ii]);
               if(prizeData[i][prop][prop1][ii] === ticket){
+                validTicket = true;
                 prizeData[i][prop][prop1][ii + 1]++;
                 updatePrize(prizeData[i]);
                 addTicketMessage(prizeData[i].viewId, ticket, prizeData[i][prop][prop1][ii + 1]);
@@ -442,6 +442,9 @@ function ticketInput(value){
       }
     }
   }
+  if(!(validTicket)) {
+    addTicketMessage(false, ticket);
+    }
 }
 
 function youWin(viewId){
@@ -453,9 +456,15 @@ function youWin(viewId){
 }
 
 function addTicketMessage(viewId, ticket, value){
-  var elId = 'w' + viewId.substr(1);
-  var el = document.getElementById(elId);
-  el.textContent = ticket + ' = ' + value;
+  if(!(viewId)){
+    alert('Game piece not found: ' + ticket);
+    document.getElementById('ticket').value = '';
+  }
+  else{
+    var elId = 'w' + viewId.substr(1);
+    var el = document.getElementById(elId);
+    el.textContent = ticket + ' = ' + value;
+  }
 }
 
 function enlargeCard(viewId){
