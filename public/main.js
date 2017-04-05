@@ -416,22 +416,42 @@ function setPrizeTitle(prize){
  */
 function ticketInput(value){
   var ticket = value || document.getElementById('ticket').value.toUpperCase();
-  var i = 0, len = prizeData.length, validTicket = false;
-  for (i; i < len; i++){
-    for (var prop in prizeData[i]){
-      if(prop === 'tickets'){
+  var i = 0, validTicket;
+
+  const ticketsAry = prizeData.map(prize => prize.tickets);
+  const arrayOfPartsArrays = ticketsAry.map(ticket => ticket.partList);
+  const ticketIdx = getTicketIdx(value, arrayOfPartsArrays);
+  //winner equal to the prizeData[n].tickets object that contains value as the winner property. If no winner property is equal to value, winner is undefined
+  const winner = isAWinningTicket(value, ticketsAry);
+
+  //Check for prizes with known winner and if the input ticket matches a winner, then add the prizeData index to the object and return the object as a single item in an array
+  // const winner = prizeData.map((cv, idx) => {
+  //   cv.tickets.idx = idx;
+  //   return cv.tickets;
+  // }).filter(cv => ticket === cv.winner);
+
+  //Find the prize that contains the ticket as a part
+  validTicket = prizeData.map(cv => cv.tickets).map(cv => cv.partList);
+const test = validTicket.reduce((acc, cv) => {
+  acc + cv;
+}, '');
+  // if(winner.length === 1){
+  //   prizeData[winner[0].idx].tickets.winner = "WINNER!";
+  //   youWin(prizeData[winner[0].idx].viewId);
+  //   alert(winner[0].winner);
+  // }
+      if('' === 'tickets'){
         for(var prop1 in prizeData[i][prop]) {
-          if (prop1 === 'winner') {
-            if (prizeData[i][prop][prop1] === ticket && ticket !== '') {
-              console.log('It\'s a Winner!');
-              prizeData[i][prop][prop1] = "WINNER!";
-              youWin(prizeData[i].viewId);
-            }
-          }
+          // if (prop1 === 'winner') {
+          //   if (prizeData[i][prop][prop1] === ticket && ticket !== '') {
+          //     console.log('It\'s a Winner!');
+          //     prizeData[i][prop][prop1] = "WINNER!";
+          //     youWin(prizeData[i].viewId);
+          //   }
+          // }
           if(prop1 === 'partList'){
             for(var ii=0; ii < prizeData[i][prop].required * 2; ii += 2){
               if(prizeData[i][prop][prop1][ii] === ticket){
-                validTicket = true;
                 prizeData[i][prop][prop1][ii + 1]++;
                 updatePrize(prizeData[i]);
                 addTicketMessage(prizeData[i].viewId, ticket, prizeData[i][prop][prop1][ii + 1]);
@@ -440,11 +460,13 @@ function ticketInput(value){
           }
         }
       }
-    }
-  }
+
   if(!(validTicket)) {
     addTicketMessage(false, ticket);
     }
+    else{
+
+  }
 }
 
 function youWin(viewId){
@@ -590,3 +612,41 @@ document.getElementById('ticket').addEventListener('keyup', function(e){
   }
 });
 document.getElementById('ticket').focus();
+
+//Pure functions
+const isAWinningTicket = (ticketId, ticketAry) => {
+  return ticketAry.find((prizeTicket) => prizeTicket.winner === ticketId);
+};
+
+const getTicketIdx = (ticketId, aryOfPartsAry) => {
+  let gridRow = getRowStrings(getGridRowByColumnData(aryOfPartsAry, ticketId));
+  let grid = aryOfPartsAry.map(row => getRowStrings(row));
+  let rowIdx = getRowIdxFromRow(grid, gridRow, 0);
+  return rowIdx;
+};
+const getGridRowByColumnData = (grid, columnData) => {
+  return (grid.find((gridRows) => {
+    return gridRows.indexOf(columnData) > -1;
+  }));
+};
+const getRowIdxFromRow = (grid, row, rowIdx) => {
+  if(rowIdx === grid.length) return -1;
+  if (arraysAreEqual(grid[rowIdx], row)) return rowIdx;
+  getRowIdxFromRow(grid, row, ++rowIdx);
+};
+const arraysAreEqual = (ary1, ary2) => {
+  if (ary1.length !== ary2.length) return false;
+  return rowsEqual(ary1, ary2);
+};
+const rowsEqual = (r1, r2) => {
+  if(r1.length < 1) return true;
+  if(r1.shift() === r2.shift()) rowsEqual(r1, r2);
+  return false;
+};
+const getRowStrings = (row) => row.filter(r => typeof r === 'string');
+
+const equalTicketParts = (tp1, tp2) => {
+  const tp1Str = getRowStrings(tp1);
+  const tp2Str = getRowStrings(tp2);
+  return arraysAreEqual(tp1Str, tp2Str);
+};
