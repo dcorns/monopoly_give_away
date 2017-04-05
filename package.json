@@ -25,5 +25,10 @@
     "corngoose": "^1.1.0",
     "express": "^4.13.4",
     "mongodb": "^2.1.7"
+  },
+  "devDependencies": {
+    "assert": "^1.4.1",
+    "chai": "^3.5.0",
+    "mocha": "^3.2.0"
   }
 }
