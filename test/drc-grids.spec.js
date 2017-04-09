@@ -1,6 +1,5 @@
 'use strict';
 const expect = require('chai').expect;
-
 const drcGrids = require('../modules/drc-grids');
 describe('drc-grids.js', () => {
 
@@ -102,6 +101,23 @@ describe('drc-grids.js', () => {
     it('returns false if input is not an array', () => {
       expect(drcGrids.isGrid('t')).to.be.false;
       expect(drcGrids.isGrid()).to.be.false;
+    });
+  });
+  describe('getGridRowIdxFromRow(grid, row)', () => {
+    it('returns the grid index of the grid row matching row', () => {
+      expect(drcGrids.getGridRowIndexFromRow([['r', 3, 8, 'y'], ['h', 3, 8, 'q'], ['h', 3], ['h', 3, 8, 'y'], ['h', 3, 8, 'y', 'z']], ['h', 3, 8, 'y'])).to.equal(3);
+    });
+    it('stops searching the grid at the first occurrence of a matching row', () => {
+      expect(drcGrids.getGridRowIndexFromRow([['h', 3, 8, 'y'], ['h', 3, 8, 'y']], ['h', 3, 8, 'y'])).to.equal(0);
+    });
+    it('it returns -1 if the row does not exist in the grid', () => {
+      expect(drcGrids.getGridRowIndexFromRow([['r', 3, 8, 'y'], ['h', 3, 8, 'q'], ['h', 3], ['h', 3, 8, 'y'], ['h', 3, 8, 'y', 'z']], ['h', 3, 8, 'y', 'x'])).to.equal(-1);
+    });
+    it('Throws TypeError if not passed two arrays', () => {
+      testThrowIfNot2ArrayArguments(drcGrids.getGridRowIndexFromRow, /Input must be 2dimArray, Array/);
+    });
+    it('Throws TypeError if grid is not a 2dimArray', () => {
+      expect(() => drcGrids.getGridRowIndexFromRow(['a', 'b'], ['a', 'b'])).to.throw(TypeError, /The first argument must be a 2 dimensional Array/);
     });
   });
 });

@@ -22,7 +22,6 @@ const isGrid = (grid) => {
   }, true);
 };
 
-
 module.exports = {
   getRowStrings: (row) => {
     if(!(Array.isArray(row))) throw new TypeError('Input must be an array');
@@ -49,4 +48,14 @@ module.exports = {
     })) || [];
   },
   isGrid: isGrid,
+  getGridRowIndexFromRow: function getGridRowIndexFromRow (grid, row, gridIdx = 0, rowIdx = 0) {
+    if(!(Array.isArray(grid)) || !(Array.isArray(row))) throw new TypeError('Input must be 2dimArray, Array');
+    if(!isGrid(grid)) throw new TypeError('The first argument must be a 2 dimensional Array');
+    if(gridIdx === grid.length) return -1;
+    if (grid[gridIdx][rowIdx] !== row[rowIdx] || grid[gridIdx].length !== row.length) return getGridRowIndexFromRow(grid, row, ++gridIdx, rowIdx);
+    if (rowIdx === row.length - 1) return gridIdx;
+    else{
+      return getGridRowIndexFromRow(grid, row, gridIdx, ++rowIdx);
+    }
+  }
 };
