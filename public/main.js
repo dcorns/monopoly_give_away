@@ -428,9 +428,9 @@ function ticketInput(value){
     addTicketMessage(false, ticket);
     }
     else{
-    updatePrize(prizeData[ticketIdx]);
     if(winner) youWin(prizeData[ticketIdx].viewId);
     else addTicketMessage(prizeData[ticketIdx].viewId, ticket, prizeData[ticketIdx].tickets.partList[prizeData[ticketIdx].tickets.partList.indexOf(ticket) + 1]);
+    updatePrize(prizeData[ticketIdx]);
   }
 }
 
