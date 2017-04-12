@@ -44,8 +44,21 @@ var addTxt10 = document.getElementById("addTxt10");
 var addTxt12 = document.getElementById("addTxt12");
 var addTxt14 = document.getElementById("addTxt14");
 var addC1Xoffset = 7, partC1Xoffset = 15, minusC1Xoffset = 44, addC2Xoffset = 66, partC2Xoffset = 74, minusC2Xoffset = 103;
-let store = {}; //Will be responsible for all state changes
-let prizeData = [];
+let store = {}; //Will be responsible for all data state changes
+let prizeData = [], view = {};//view will be responsible for all view state changes
+view.current = {prize: false};
+view.setCurrent = (prop, val) => {
+  view.current[prop] = val;
+};
+view.setWinningTicketOnPrizeCard = (prize) => {
+  const winningTicket = checkForRareTicket(prize);
+  if(winningTicket){
+    document.getElementById(`w${prize.viewId.substr(1)}`).textContent = winningTicket;
+  }
+  else {
+    document.getElementById(`w${prize.viewId.substr(1)}`).textContent = 'Winner Unknown';
+  }
+};
 store.setPrizeDataToRemote = (url, cb) => {
   const ajaxReq = new XMLHttpRequest();
   ajaxReq.addEventListener('load', function(){
@@ -389,7 +402,7 @@ function configureUi(ary){
  * @param {string} prize.viewId - The id of the top level svg that makes up the given prizes DOM node
  */
 function setWinningTicket(prize){
-  var ticket, wIdx;
+  let ticket, wIdx;
   ticket = checkForRareTicket(prize);
   if(ticket){
     wIdx = prize.viewId.substr(1);
@@ -420,14 +433,15 @@ function ticketInput(value){
   //winner equal to the prizeData[n].tickets object that contains value as the winner property. If no winner property is equal to value, winner is undefined
   const winner = isAWinningTicket(value, ticketsAry);
 
-  if(!(ticketIdx)) {
+  if(ticketIdx < 0) {
     addTicketMessage(false, ticket);
     }
     else{
-    if(winner) youWin(prizeData[ticketIdx].viewId);
-    else addTicketMessage(prizeData[ticketIdx].viewId, ticket, prizeData[ticketIdx].tickets.partList[prizeData[ticketIdx].tickets.partList.indexOf(ticket) + 1] + 1);
+    const prize = prizeData[ticketIdx];
+    if(winner) youWin(prize.viewId);
+    else addTicketMessage(prize.viewId, ticket, prize.tickets.partList[prize.tickets.partList.indexOf(ticket) + 1] + 1, prize);
     store.incrementTicketPartQuantity(ticketIdx, ticket, 1);
-    updatePrize(prizeData[ticketIdx]);
+    updatePrize(prize);
   }
 }
 
@@ -439,15 +453,15 @@ function youWin(viewId){
   el.classList.remove('winnerTxt');
 }
 
-function addTicketMessage(viewId, ticket, value){
+function addTicketMessage(viewId, ticket, value, prize){
   if(!(viewId)){
     alert('Game piece not found: ' + ticket);
     document.getElementById('ticket').value = '';
   }
   else{
-    let elId = 'w' + viewId.substr(1);
-    let el = document.getElementById(elId);
-    el.textContent = ticket + ' = ' + value;
+    if(view.current.prize && !Object.is(view.current.prize, prize)) view.setWinningTicketOnPrizeCard(view.current.prize);
+    view.setCurrent('prize', prize);
+    document.getElementById(`w${prize.viewId.substr(1)}`).textContent = `${ticket} = ${value}`;
   }
 }
 
@@ -582,10 +596,5 @@ const isAWinningTicket = (ticketId, ticketAry) => {
 const getTicketIdx = (ticketId, aryOfPartsAry) => {
   let gridRow = grids.getRowStrings(grids.getGridRowByColumnData(aryOfPartsAry, ticketId));
   let grid = aryOfPartsAry.map(row => grids.getRowStrings(row));
-  let rowIdx = grids.getRowIdxFromRow(grid, gridRow, 0);
-  return rowIdx;
-};
-//const getRowStrings = (row) => row.filter(r => typeof r === 'string');
-const incrementTicketPartQuantity = (ticket, value) =>{
-console.log(ticket);
+  return grids.getRowIdxFromRow(grid, gridRow, 0);
 };
