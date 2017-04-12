@@ -5,7 +5,6 @@
  */
 'use strict';
 const grids = require('../modules/drc-grids');
-var prizeData = [{"_id":"56d0da05a1f6053f7b7f5a75","name":"Redbox Movies for a Year","value":78,"available":1749,"tickets":{"required":4,"partList":["N559A",2,"N560B",1,"N561C",2,"N562D",0],"winner":"N562D"},"startAvailable":1750}];
 var currentPrize;
 var currentIndex;
 var goBack = document.getElementById("goBack");
@@ -45,8 +44,25 @@ var addTxt10 = document.getElementById("addTxt10");
 var addTxt12 = document.getElementById("addTxt12");
 var addTxt14 = document.getElementById("addTxt14");
 var addC1Xoffset = 7, partC1Xoffset = 15, minusC1Xoffset = 44, addC2Xoffset = 66, partC2Xoffset = 74, minusC2Xoffset = 103;
-
-getData('/allPrizeData', function(err, data){
+let store = {}; //Will be responsible for all state changes
+let prizeData = [];
+store.setPrizeDataToRemote = (url, cb) => {
+  const ajaxReq = new XMLHttpRequest();
+  ajaxReq.addEventListener('load', function(){
+    if(ajaxReq.status === 200) cb(null, ajaxReq.responseText);
+    else cb(ajaxReq.responseText, null);
+  });
+  ajaxReq.addEventListener('error', function(data){
+    cb({XMLHttpRequestError: 'A fatal error occurred, see console for more information'}, null);
+  });
+  ajaxReq.open('GET', url, true);
+  ajaxReq.send();
+};
+store.incrementTicketPartQuantity = (ticketIdx, ticket, value) => {
+  let partList = prizeData[ticketIdx].tickets.partList;
+  partList[partList.indexOf(ticket) + 1] += value;
+};
+store.setPrizeDataToRemote('/allPrizeData', function(err, data){
   if (err){
     alert('There was a problem loading prize Data!');
     console.dir(err);
@@ -285,29 +301,9 @@ function adjustTicketQuantity(addBtn, qidx, q){
   addBtn.textContent = currentPrize.tickets.partList[qidx];
 }
 
-function getData(url, cb, token){
-  var ajaxReq = new XMLHttpRequest();
-  ajaxReq.addEventListener('load', function(){
-    if(ajaxReq.status === 200) cb(null, ajaxReq.responseText);
-    else cb(ajaxReq.responseText, null);
-  });
-  ajaxReq.addEventListener('error', function(data){
-    console.dir(ajaxReq);
-    console.dir(data);
-    cb({XMLHttpRequestError: 'A fatal error occurred, see console for more information'}, null);
-  });
-
-  ajaxReq.open('GET', url, true);
-  //ajaxReq.setRequestHeader('Content-Type', 'application/json');
-  if(token){
-    ajaxReq.setRequestHeader('Authorization', token);
-  }
-  ajaxReq.send();
-}
-
 function updatePrize(prize){
   if(!prize.tickets.winner){
-    var ticket = checkForRareTicket(prize);
+    let ticket = checkForRareTicket(prize);
     if(ticket){
       prize.tickets.winner = ticket;
     }
@@ -317,7 +313,7 @@ function updatePrize(prize){
       console.dir(err);
       return;
     }
-    getData('/allPrizeData', function(err, data){
+    store.setPrizeDataToRemote('/allPrizeData', function(err, data){
       if (err){
         alert('There was a problem loading prize Data!');
         console.dir(err);
@@ -416,7 +412,7 @@ function setPrizeTitle(prize){
  * @param value
  */
 function ticketInput(value){
-  var ticket = value || document.getElementById('ticket').value.toUpperCase();
+  let ticket = value || document.getElementById('ticket').value.toUpperCase();
 
   const ticketsAry = prizeData.map(prize => prize.tickets);
   const arrayOfPartsArrays = ticketsAry.map(ticket => ticket.partList);
@@ -429,7 +425,8 @@ function ticketInput(value){
     }
     else{
     if(winner) youWin(prizeData[ticketIdx].viewId);
-    else addTicketMessage(prizeData[ticketIdx].viewId, ticket, prizeData[ticketIdx].tickets.partList[prizeData[ticketIdx].tickets.partList.indexOf(ticket) + 1]);
+    else addTicketMessage(prizeData[ticketIdx].viewId, ticket, prizeData[ticketIdx].tickets.partList[prizeData[ticketIdx].tickets.partList.indexOf(ticket) + 1] + 1);
+    store.incrementTicketPartQuantity(ticketIdx, ticket, 1);
     updatePrize(prizeData[ticketIdx]);
   }
 }
@@ -448,8 +445,8 @@ function addTicketMessage(viewId, ticket, value){
     document.getElementById('ticket').value = '';
   }
   else{
-    var elId = 'w' + viewId.substr(1);
-    var el = document.getElementById(elId);
+    let elId = 'w' + viewId.substr(1);
+    let el = document.getElementById(elId);
     el.textContent = ticket + ' = ' + value;
   }
 }
@@ -583,9 +580,12 @@ const isAWinningTicket = (ticketId, ticketAry) => {
   return ticketAry.find((prizeTicket) => prizeTicket.winner === ticketId);
 };
 const getTicketIdx = (ticketId, aryOfPartsAry) => {
-  let gridRow = getRowStrings(grids.getGridRowByColumnData(aryOfPartsAry, ticketId));
+  let gridRow = grids.getRowStrings(grids.getGridRowByColumnData(aryOfPartsAry, ticketId));
   let grid = aryOfPartsAry.map(row => grids.getRowStrings(row));
   let rowIdx = grids.getRowIdxFromRow(grid, gridRow, 0);
   return rowIdx;
 };
-const getRowStrings = (row) => row.filter(r => typeof r === 'string');
+//const getRowStrings = (row) => row.filter(r => typeof r === 'string');
+const incrementTicketPartQuantity = (ticket, value) =>{
+console.log(ticket);
+};

@@ -83,12 +83,12 @@ describe('drc-grids.js', () => {
       expect(drcGrids.getGridRowByColumnData([[24, 32, 'a'], [43, 21, 56], [73, 'r', {}]], 12)).to.deep.equal([]);
     });
     it('returns [] if the grid is empty', () => {
-      expect(drcGrids.getGridRowByColumnData([])).to.deep.equal([]);
       expect(drcGrids.getGridRowByColumnData([[]])).to.deep.equal([]);
       expect(drcGrids.getGridRowByColumnData([[]], 'x')).to.deep.equal([]);
     });
-    it('throws TypeError if grid is not an array', () => {
+    it('throws TypeError if grid is not a 2 dimensional array', () => {
       expect(() => drcGrids.getGridRowByColumnData('x', [])).to.throw(TypeError, /Input must be 2dimArray, Any/);
+      expect(() => drcGrids.getGridRowByColumnData([])).to.throw(TypeError, /Input must be 2dimArray, Any/);
     });
   });
   describe('isGrid(grid)', () => {
@@ -97,6 +97,7 @@ describe('drc-grids.js', () => {
     });
     it('returns false if input is not a grid', () => {
       expect(drcGrids.isGrid([3, 5, 'z'])).to.be.false;
+      expect(drcGrids.isGrid([])).to.be.false;
     });
     it('returns false if input is not an array', () => {
       expect(drcGrids.isGrid('t')).to.be.false;
@@ -118,6 +119,56 @@ describe('drc-grids.js', () => {
     });
     it('Throws TypeError if grid is not a 2dimArray', () => {
       expect(() => drcGrids.getGridRowIndexFromRow(['a', 'b'], ['a', 'b'])).to.throw(TypeError, /The first argument must be a 2 dimensional Array/);
+    });
+  });
+  describe('setColumnData(row, rowIdx, value)', () => {
+    it('returns a shallow copy of row with the column at rowIdx set to value', () => {
+      let row = ['a', 3, 'c'];
+      expect(drcGrids.setColumnData(row, 1, 'b')).to.deep.equal(['a', 'b', 'c']);
+      expect(drcGrids.setColumnData(row, 1, 'b')).not.deep.equal(row);
+    });
+    it('returns a copy of the row if no value is passed', () => {
+      expect(drcGrids.setColumnData(['r', 2], 1)).to.deep.equal(['r', 2]);
+    });
+    it('it throws TypeError argument 1 is not an array', () => {
+      expect(() => drcGrids.setColumnData('x')).to.throw(TypeError, /The first argument must be an array/);
+    });
+    it('it throws TypeError argument 2 is not an positive integer', () => {
+      expect(() => drcGrids.setColumnData([],'5')).to.throw(TypeError, /The second argument must be 0 or a positive integer/);
+      expect(() => drcGrids.setColumnData([], -5)).to.throw(TypeError, /The second argument must be 0 or a positive integer/);
+      expect(() => drcGrids.setColumnData([], 6.2)).to.throw(TypeError, /The second argument must be 0 or a positive integer/);
+    });
+  });
+  describe('setGridRowData(grid, gridRowIdx, row)', () => {
+    let grid = [[3,6,2,'a'], ['x', 4, 'c'], [0, 't', 12, 7], [1,2]];
+    it('returns a shallow copy of grid where the value at gridRowIdx equals row', () => {
+      expect(drcGrids.setGridRowData(grid, 2, [4, 'p', 'x', 7])).to.deep.equal([[3,6,2,'a'], ['x', 4, 'c'], [4, 'p', 'x', 7], [1,2]]);
+      expect(drcGrids.setGridRowData(grid, 2, [4, 'p', 'x', 7])).to.not.deep.equal(grid);
+    });
+    it('returns a copy of the grid if no row is passed', () => {
+      expect(drcGrids.setGridRowData(grid, 2)).to.deep.equal(grid);
+    });
+    it('throws TypeError if argument 1 is not a 2 dimensional array', () => {
+      expect(() => drcGrids.setGridRowData(3, 2, [])).to.throw(TypeError, /The first argument must be a 2 dimensional array/);
+      expect(() => drcGrids.setGridRowData([], 2, [])).to.throw(TypeError, /The first argument must be a 2 dimensional array/);
+    });
+    it('throws TypeError if argument 2 is not a positive integer or 0', () => {
+      expect(() => drcGrids.setGridRowData(grid, '2', [])).to.throw(TypeError, /The second argument must be 0 or a positive integer/);
+      expect(() => drcGrids.setGridRowData(grid, -2, [])).to.throw(TypeError, /The second argument must be 0 or a positive integer/);
+      expect(() => drcGrids.setGridRowData(grid, 2.2, [])).to.throw(TypeError, /The second argument must be 0 or a positive integer/);
+    });
+    it('throws TypeError if argument 3 is not an array', () => {
+      expect(() => drcGrids.setGridRowData(grid, 2, 4)).to.throw(TypeError, /The third argument must be an array/);
+    });
+  });
+  describe('setGridColumnData(grid, gridRowIdx, ColumnIdx, value)', () => {
+    let grid = [[3,6,2,'a'], ['x', 4, 'c'], [0, 't', 12, 7], [1,2]];
+    it('returns a shallow copy of grid with the column data at gridRowIdx, ColumnIdx set to value', () => {
+      expect(drcGrids.setGridColumnData(grid, 1, 3, 'added new column')).to.deep.equal([[3,6,2,'a'], ['x', 4, 'c', 'added new column'], [0, 't', 12, 7], [1,2]]);
+    });
+    it('throws TypeError if argument 1 is not a 2 dimensional array', () => {
+      expect(() => drcGrids.setGridColumnData(3, 1, 3, 'added new column')).to.throw(TypeError, /The first argument must be a 2 dimensional array/);
+      expect(() => drcGrids.setGridColumnData([], 1, 3, 'added new column')).to.throw(TypeError, /The first argument must be a 2 dimensional array/);
     });
   });
 });

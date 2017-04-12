@@ -17,9 +17,27 @@ const rowsEqual = (r1, r2) =>{
 };
 const isGrid = (grid) => {
   if(!Array.isArray(grid)) return false;
+  if(grid.length < 1) return false;
   return grid.reduce((result, g) => {
     return result && Array.isArray(g);
   }, true);
+};
+const setColumnData = (row, rowIdx, value) => {
+  if(!Array.isArray(row)) throw new TypeError('The first argument must be an array');
+  if(!Number.isInteger(rowIdx)) throw new TypeError('The second argument must be 0 or a positive integer');
+  if(rowIdx < 0) throw new TypeError('The second argument must be 0 or a positive integer');
+  const rowCopy = row.slice();
+  rowCopy[rowIdx] = value || row[rowIdx];
+  return rowCopy;
+};
+const setGridRowData = (grid, gridRowIdx, row) => {
+  if(!Number.isInteger(gridRowIdx)) throw new TypeError('The second argument must be 0 or a positive integer');
+  if(gridRowIdx < 0) throw new TypeError('The second argument must be 0 or a positive integer');
+  if(row && !Array.isArray(row)) throw new TypeError('The third argument must be an array');
+  if(!(isGrid(grid))) throw new TypeError('The first argument must be a 2 dimensional array');
+  const gridCopy = grid.slice();
+  gridCopy[gridRowIdx] = row || grid[gridRowIdx];
+  return gridCopy;
 };
 
 module.exports = {
@@ -42,7 +60,7 @@ module.exports = {
     }, -1);
   },
   getGridRowByColumnData: (grid, columnData) => {
-    if(!isGrid(grid)) throw TypeError('Input must be 2dimArray, Any');
+    if(!isGrid(grid)) throw new TypeError('Input must be 2dimArray, Any');
     return (grid.find((gridRows) => {
       return gridRows.indexOf(columnData) > -1;
     })) || [];
@@ -57,5 +75,12 @@ module.exports = {
     else{
       return getGridRowIndexFromRow(grid, row, gridIdx, ++rowIdx);
     }
-  }
+  },
+  setGridColumnData: (grid, gridRowIdx, columnIdx, value) => {
+    if(!(isGrid(grid))) throw new TypeError('The first argument must be a 2 dimensional array');
+    const gridCopy = grid.slice();
+    return setGridRowData(gridCopy, gridRowIdx, setColumnData(gridCopy[gridRowIdx], columnIdx, value));
+  },
+  setColumnData: setColumnData,
+  setGridRowData: setGridRowData,
 };
