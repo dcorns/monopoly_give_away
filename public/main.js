@@ -8,7 +8,7 @@ const grids = require('../modules/drc-grids');
 var currentPrize;
 var currentIndex;
 var goBack = document.getElementById("goBack");
-var prizes = document.getElementById("prizes");
+var prizes = document.getElementById("prizes");//root svg element
 var btnMenu = document.getElementById("btnMenu");
 var winnerTxt = document.getElementById("winnerTxt");
 var add0 = document.getElementById("add0");
@@ -85,7 +85,7 @@ store.setPrizeDataToRemote('/allPrizeData', function(err, data){
   configureUi(prizeData);
 });
 
-
+//add all svg event handlers
 prizes.addEventListener('click', function(e){
   try{
     switch (e.target.id){
@@ -146,15 +146,9 @@ prizes.addEventListener('click', function(e){
       default:
         var prizeId = e.target.id.substr(1);
         document.getElementById('w' + prizeId).classList.add('less');
-        var idx = 0, c = 0;
-        for(c;c<prizeData.length;c++){
-          if(prizeData[c].viewId === e.target.id){
-            idx = c;
-            break;
-          }
-        }
-        currentPrize = setCurrentPrize(prizeData[idx]);
-        currentIndex = idx;
+        const prizeIdx = prizeData.findIndex((pd) => pd.viewId === e.target.id);
+        currentPrize = setCurrentPrize(prizeData[prizeIdx]);
+        currentIndex = prizeIdx;
         var x = e.target.x.baseVal.value;
         var y = e.target.y.baseVal.value;
         prizes.setAttribute('viewBox', (x - 1).toString()+' '+ (y + 4).toString() + ' ' + '112 ' + '75');
@@ -163,15 +157,15 @@ prizes.addEventListener('click', function(e){
         goBack.setAttribute('data-PrizeId', prizeId);
         winnerTxt.setAttribute('x', (x + 55).toString());
         winnerTxt.setAttribute('y', (y + 24).toString());
-        winnerTxt.textContent = 'Winning Ticket: ' + prizeData[idx].tickets.winner;
+        winnerTxt.textContent = 'Winning Ticket: ' + prizeData[prizeIdx].tickets.winner;
         add0.setAttribute('cx', (x + addC1Xoffset).toString());
         add0.setAttribute('cy', (y + 32).toString());
         addTxt0.setAttribute('x', (x + addC1Xoffset).toString());
         addTxt0.setAttribute('y', (y + 34).toString());
-        addTxt0.textContent = prizeData[idx].tickets.partList[1];
+        addTxt0.textContent = prizeData[prizeIdx].tickets.partList[1];
         part1.setAttribute('x', (x + partC1Xoffset).toString());
         part1.setAttribute('y', (y + 35).toString());
-        part1.textContent = prizeData[idx].tickets.partList[0];
+        part1.textContent = prizeData[prizeIdx].tickets.partList[0];
         minus0.setAttribute('cx', (x + minusC1Xoffset).toString());
         minus0.setAttribute('cy', (y + 32).toString());
 
@@ -179,10 +173,10 @@ prizes.addEventListener('click', function(e){
         add2.setAttribute('cy', (y + 32).toString());
         addTxt2.setAttribute('x', (x + addC2Xoffset).toString());
         addTxt2.setAttribute('y', (y + 34).toString());
-        addTxt2.textContent = prizeData[idx].tickets.partList[3];
+        addTxt2.textContent = prizeData[prizeIdx].tickets.partList[3];
         part2.setAttribute('x', (x + partC2Xoffset).toString());
         part2.setAttribute('y', (y + 35).toString());
-        part2.textContent = prizeData[idx].tickets.partList[2];
+        part2.textContent = prizeData[prizeIdx].tickets.partList[2];
         minus2.setAttribute('cx', (x + minusC2Xoffset).toString());
         minus2.setAttribute('cy', (y + 32).toString());
 
@@ -190,10 +184,10 @@ prizes.addEventListener('click', function(e){
         add4.setAttribute('cy', (y + 45).toString());
         addTxt4.setAttribute('x', (x + addC1Xoffset).toString());
         addTxt4.setAttribute('y', (y + 47).toString());
-        addTxt4.textContent = prizeData[idx].tickets.partList[5];
+        addTxt4.textContent = prizeData[prizeIdx].tickets.partList[5];
         part3.setAttribute('x', (x + partC1Xoffset).toString());
         part3.setAttribute('y', (y + 48).toString());
-        part3.textContent = prizeData[idx].tickets.partList[4];
+        part3.textContent = prizeData[prizeIdx].tickets.partList[4];
         minus4.setAttribute('cx', (x + minusC1Xoffset).toString());
         minus4.setAttribute('cy', (y + 45).toString());
 
@@ -201,55 +195,55 @@ prizes.addEventListener('click', function(e){
         add6.setAttribute('cy', (y + 45).toString());
         addTxt6.setAttribute('x', (x + addC2Xoffset).toString());
         addTxt6.setAttribute('y', (y + 47).toString());
-        addTxt6.textContent = prizeData[idx].tickets.partList[7];
+        addTxt6.textContent = prizeData[prizeIdx].tickets.partList[7];
         part4.setAttribute('x', (x + partC2Xoffset).toString());
         part4.setAttribute('y', (y + 48).toString());
-        part4.textContent = prizeData[idx].tickets.partList[6];
+        part4.textContent = prizeData[prizeIdx].tickets.partList[6];
         minus6.setAttribute('cx', (x + minusC2Xoffset).toString());
         minus6.setAttribute('cy', (y + 45).toString());
 
-        if (prizeData[idx].tickets.partList[8]) {
+        if (prizeData[prizeIdx].tickets.partList[8]) {
           add8.setAttribute('cx', (x + addC1Xoffset).toString());
           add8.setAttribute('cy', (y + 58).toString());
           addTxt8.setAttribute('x', (x + addC1Xoffset).toString());
           addTxt8.setAttribute('y', (y + 60).toString());
-          addTxt8.textContent = prizeData[idx].tickets.partList[9];
+          addTxt8.textContent = prizeData[prizeIdx].tickets.partList[9];
           part5.setAttribute('x', (x + partC1Xoffset).toString());
           part5.setAttribute('y', (y + 61).toString());
-          part5.textContent = prizeData[idx].tickets.partList[8];
+          part5.textContent = prizeData[prizeIdx].tickets.partList[8];
           minus8.setAttribute('cx', (x + minusC1Xoffset).toString());
           minus8.setAttribute('cy', (y + 58).toString());
-          if(prizeData[idx].tickets.partList[10]){
+          if(prizeData[prizeIdx].tickets.partList[10]){
             add10.setAttribute('cx', (x + addC2Xoffset).toString());
             add10.setAttribute('cy', (y + 58).toString());
             addTxt10.setAttribute('x', (x + addC2Xoffset).toString());
             addTxt10.setAttribute('y', (y + 60).toString());
-            addTxt10.textContent = prizeData[idx].tickets.partList[11];
+            addTxt10.textContent = prizeData[prizeIdx].tickets.partList[11];
             part6.setAttribute('x', (x + partC2Xoffset).toString());
             part6.setAttribute('y', (y + 61).toString());
-            part6.textContent = prizeData[idx].tickets.partList[10];
+            part6.textContent = prizeData[prizeIdx].tickets.partList[10];
             minus10.setAttribute('cx', (x + minusC2Xoffset).toString());
             minus10.setAttribute('cy', (y + 58).toString());
-            if(prizeData[idx].tickets.partList[12]){
+            if(prizeData[prizeIdx].tickets.partList[12]){
               add12.setAttribute('cx', (x + addC1Xoffset).toString());
               add12.setAttribute('cy', (y + 71).toString());
               addTxt12.setAttribute('x', (x + addC1Xoffset).toString());
               addTxt12.setAttribute('y', (y + 73).toString());
-              addTxt12.textContent = prizeData[idx].tickets.partList[13];
+              addTxt12.textContent = prizeData[prizeIdx].tickets.partList[13];
               part7.setAttribute('x', (x + partC1Xoffset).toString());
               part7.setAttribute('y', (y + 74).toString());
-              part7.textContent = prizeData[idx].tickets.partList[12];
+              part7.textContent = prizeData[prizeIdx].tickets.partList[12];
               minus12.setAttribute('cx', (x + minusC1Xoffset).toString());
               minus12.setAttribute('cy', (y + 71).toString());
-              if(prizeData[idx].tickets.partList[14]){
+              if(prizeData[prizeIdx].tickets.partList[14]){
                 add14.setAttribute('cx', (x + addC2Xoffset).toString());
                 add14.setAttribute('cy', (y + 71).toString());
                 addTxt14.setAttribute('x', (x + addC2Xoffset).toString());
                 addTxt14.setAttribute('y', (y + 73).toString());
-                addTxt14.textContent = prizeData[idx].tickets.partList[15];
+                addTxt14.textContent = prizeData[prizeIdx].tickets.partList[15];
                 part8.setAttribute('x', (x + partC2Xoffset).toString());
                 part8.setAttribute('y', (y + 74).toString());
-                part8.textContent = prizeData[idx].tickets.partList[14];
+                part8.textContent = prizeData[prizeIdx].tickets.partList[14];
                 minus14.setAttribute('cx', (x + minusC2Xoffset).toString());
                 minus14.setAttribute('cy', (y + 71).toString());
               }
