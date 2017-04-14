@@ -8,7 +8,7 @@ const grids = require('../modules/drc-grids');
 var currentPrize;
 var currentIndex;
 var goBack = document.getElementById("goBack");
-var prizes = document.getElementById("prizes");//root svg element
+const svgRoot = document.getElementById("prizes");//root svg element
 var btnMenu = document.getElementById("btnMenu");
 var winnerTxt = document.getElementById("winnerTxt");
 var add0 = document.getElementById("add0");
@@ -68,7 +68,7 @@ view.enlargeCard = (target) => {
   currentIndex = prizeIdx;
   const x = target.x.baseVal.value;
   const y = target.y.baseVal.value;
-  prizes.setAttribute('viewBox', (x - 1).toString() + ' ' + (y + 4).toString() + ' ' + '112 ' + '75');
+  svgRoot.setAttribute('viewBox', (x - 1).toString() + ' ' + (y + 4).toString() + ' ' + '112 ' + '75');
   goBack.setAttribute('cx', (x + 105).toString());
   goBack.setAttribute('cy', (y + 5).toString());
   goBack.setAttribute('data-PrizeId', prizeId);
@@ -195,7 +195,7 @@ store.setPrizeDataToRemote('/allPrizeData', function (err, data) {
 });
 
 //add all svg event handlers
-prizes.addEventListener('click', function (e) {
+svgRoot.addEventListener('click', function (e) {
   try {
     switch (e.target.id) {
       case 'add0':
@@ -299,8 +299,8 @@ function reset(e) {
   addTxt10.setAttribute('x', '500');
   addTxt12.setAttribute('x', '500');
   addTxt14.setAttribute('x', '500');
-  prizes.setAttribute('viewBox', '-400 -300 800 600');
-  if (prizeChanged()) {
+  svgRoot.setAttribute('viewBox', '-400 -300 800 600');
+  if (prizeChanged(currentPrize.tickets.partList)) {
     console.log('updating prize');
     updatePrize(currentPrize);
   }
@@ -356,10 +356,11 @@ function ajaxPostJson(url, jsonData, cb, token) {
   ajaxReq.send(JSON.stringify(jsonData));
 }
 
-function prizeChanged() {
+function prizeChanged(partList) {
+  //if(!grids.rowsEqual(partList, prizeData[currentIndex].tickets.partList)) return true;
   var c = 0;
-  for (c; c < currentPrize.tickets.partList.length; c++) {
-    if (currentPrize.tickets.partList[c] !== prizeData[currentIndex].tickets.partList[c]) return true;
+  for (c; c < partList.length; c++) {
+    if (partList[c] !== prizeData[currentIndex].tickets.partList[c]) return true;
   }
   return (currentPrize.tickets.winner !== prizeData[currentIndex].tickets.winner);
 }
