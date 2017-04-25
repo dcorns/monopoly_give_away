@@ -350,7 +350,7 @@ function updatePrize(prize) {
 }
 
 function ajaxPostJson(url, jsonData, cb, token) {
-  var ajaxReq = new XMLHttpRequest();
+  const ajaxReq = new XMLHttpRequest();
   ajaxReq.addEventListener('load', function () {
     if (ajaxReq.status === 200) cb(null, JSON.parse(ajaxReq.responseText));
     else cb(JSON.parse(ajaxReq.responseText), null);
