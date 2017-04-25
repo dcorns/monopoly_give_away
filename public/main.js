@@ -9,7 +9,6 @@ var currentPrize;
 var currentIndex;
 const largeCardClose = document.getElementById("goBack");
 const svgRoot = document.getElementById("prizes");//root svg element
-const btnMenu = document.getElementById("btnMenu");
 const largeCardSubTitle = document.getElementById("winnerTxt");
 const btnAdd0 = document.getElementById("add0");
 const btnAdd2 = document.getElementById("add2");
