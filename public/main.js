@@ -51,10 +51,10 @@ view.setCurrent = (prop, val) => {
 };
 view.positionViewBox = (x, y, elId) => {
   let el = document.getElementById(elId);
-  let test = el.getAttribute('viewBox');
+  //let test = el.getAttribute('viewBox');
   let w = el.width.baseVal.value;
   let allofit = el.viewBox.baseVal;
-  el.setAttribute('viewBox', `${x} ${y} 112 75`);
+  el.setAttribute('viewBox', `${x} ${y} 112 95`);
 };
 view.setWinningTicketOnPrizeCard = (prize) => {
   const winningTicket = checkForRareTicket(prize);
@@ -312,7 +312,7 @@ function reset(e) {
   addTxt10.setAttribute('x', '500');
   addTxt12.setAttribute('x', '500');
   addTxt14.setAttribute('x', '500');
-  svgRoot.setAttribute('viewBox', '-400 -300 800 600');
+  svgRoot.setAttribute('viewBox', '-400 -300 800 690');
   if (prizeChanged(currentPrize.tickets.partList)) {
     console.log('updating prize');
     updatePrize(currentPrize);
