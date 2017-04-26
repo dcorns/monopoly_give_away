@@ -5,8 +5,10 @@
  */
 'use strict';
 const grids = require('../modules/drc-grids');
-var currentPrize;
-var currentIndex;
+let loggedIn = false;
+let hasToken = false;
+let currentPrize;
+let currentIndex;
 const largeCardClose = document.getElementById("goBack");
 const svgRoot = document.getElementById("prizes");//root svg element
 const largeCardSubTitle = document.getElementById("winnerTxt");
@@ -45,6 +47,7 @@ var addTxt14 = document.getElementById("addTxt14");
 let store = {}; //Will be responsible for all data state changes
 let prizeData = [], view = {};//view will be responsible for all view state changes
 const remoteDataUrl = 'https://pjpk6esqw5.execute-api.us-west-2.amazonaws.com/prod';
+const tokenResource = 'wherever I am getting authorization token';
 view.current = {prize: false};
 view.setCurrent = (prop, val) => {
   view.current[prop] = val;
@@ -179,6 +182,19 @@ view.enlargeCard = (target) => {
       }
     }
   }
+};
+view.toggle = (el) => {
+  const elem = document.getElementById(el);
+  elem.classList.contains('hide') ?  elem.classList.remove('hide') : elem.classList.add('hide');
+};
+view.toggleTokenRequestView = () => {
+  view.toggle('emailOrPhone');
+  view.toggle('btnSendTokenRequest');
+};
+view.toggleLoginView =() => view.toggle('btnLogin');
+view.toggleCredentialView = () => {
+  view.toggleTokenRequestView();
+  view.toggleLoginView();
 };
 store.setPrizeDataToRemote = (url, cb) => {
   const ajaxReq = new XMLHttpRequest();
@@ -496,7 +512,24 @@ document.getElementById('ticket').addEventListener('keyup', function (e) {
   }
 });
 document.getElementById('ticket').focus();
-
+document.getElementById('btnLogin').addEventListener('click', () => {
+  if(!(loggedIn)) logIn();
+});
+document.getElementById('btnSendTokenRequest').addEventListener('click', () => {
+  requestToken(document.getElementById('emailOrPhone').value, tokenResource, (err, data) => {
+    //When user has confirmed ownership of phone or email, Store or assign token to memory for subsequent requests
+  });
+});
+const logIn = () => {
+  view.toggleCredentialView();
+};
+const requestToken = (emailOrPhone, tokenProvider, cb) => {
+  console.log('requestTokenCalled');
+  view.toggleCredentialView();
+  //email or phone validation if not in view
+  //const jsonOut = {"sendTo": emailOrPhone };
+  //ajaxPostJson(tokenProvider, jsonOut, cb);
+};
 //Pure functions
 const isAWinningTicket = (ticketId, ticketAry) => {
   return ticketAry.find((prizeTicket) => prizeTicket.winner === ticketId);
